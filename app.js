@@ -1,4 +1,4 @@
-// Dummy food catalog with tags used for filter and weather suggestions.
+// Local food catalog with tags used for filters and weather suggestions.
 const FOOD_ITEMS = [
   { id: "f1", name: "Margherita Pizza", price: 11.99, calories: 780, category: "Pizza", tags: ["high-protein"], image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=900&auto=format&fit=crop" },
   { id: "f2", name: "Chicken Burger", price: 8.49, calories: 640, category: "Burger", tags: ["high-protein"], image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=900&auto=format&fit=crop" },
@@ -116,7 +116,13 @@ function getFilteredFood(items) {
   });
 }
 
-function createFoodCard(item, target, buttonText = "Add to cart") {
+function humanizeTag(tag) {
+  if (tag === "low-calorie") return "Low calorie";
+  if (tag === "high-protein") return "High protein";
+  return tag;
+}
+
+function createFoodCard(item, target, buttonText = "Add") {
   const card = els.foodCardTemplate.content.firstElementChild.cloneNode(true);
   const image = card.querySelector(".food-image");
   const name = card.querySelector(".food-name");
@@ -136,7 +142,7 @@ function createFoodCard(item, target, buttonText = "Add to cart") {
   item.tags.forEach((tag) => {
     const span = document.createElement("span");
     span.className = "tag";
-    span.textContent = tag;
+    span.textContent = humanizeTag(tag);
     tagsWrap.appendChild(span);
   });
 
@@ -154,7 +160,7 @@ function renderFoodGrid() {
   const items = getFilteredFood(FOOD_ITEMS);
 
   if (items.length === 0) {
-    els.foodGrid.innerHTML = "<p>No matching items found.</p>";
+    els.foodGrid.innerHTML = "<p>No dishes match that search. Try another keyword.</p>";
     return;
   }
 
@@ -206,14 +212,14 @@ function renderCart() {
         <strong>${item.name}</strong>
         <p>$${item.price.toFixed(2)} x ${entry.qty} | ${item.calories} kcal</p>
       </div>
-      <button class="icon-btn" aria-label="Remove item">−</button>
+      <button class="icon-btn" aria-label="Remove one item">−</button>
     `;
     row.querySelector("button").addEventListener("click", () => removeFromCart(item.id));
     els.cartItems.appendChild(row);
   });
 
   if (state.cart.length === 0) {
-    els.cartItems.innerHTML = "<p>Your cart is empty.</p>";
+    els.cartItems.innerHTML = "<p>Your cart is empty for now. Add something tasty.</p>";
   }
 
   els.summaryItems.textContent = String(totalItems);
@@ -313,9 +319,9 @@ async function fetchWeatherAndRecommend() {
     els.weatherTemp.textContent = `${temp}°C`;
     els.weatherCondition.textContent = condition;
   } catch (error) {
-    // Fallback keeps app functional without network/API availability.
+    // Fallback keeps the app useful even without network/API access.
     state.weatherType = "moderate";
-    els.weatherLocation.textContent = "Unknown";
+    els.weatherLocation.textContent = "Nearby";
     els.weatherTemp.textContent = "N/A";
     els.weatherCondition.textContent = "Pleasant";
   } finally {
