@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuickBite - Food Delivery</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">QuickBite</div>
+    <div class="search-wrap">
+      <input id="searchInput" type="text" placeholder="Search food..." aria-label="Search food items" />
+    </div>
+    <div class="nav-actions">
+      <button id="darkModeToggle" class="icon-btn" aria-label="Toggle dark mode">🌙</button>
+      <button id="cartToggle" class="cart-btn" aria-label="Open cart">
+        🛒 <span id="cartCount">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Delicious food, delivered fast.</h1>
+        <p>Fresh meals, healthy choices, and comfort snacks for every mood.</p>
+        <button class="primary-btn" id="exploreBtn">Explore Menu</button>
+      </div>
+      <div class="hero-banner" aria-hidden="true">🍕 🍔 🥗 🍨 ☕</div>
+    </section>
+
+    <section class="weather-section card">
+      <div class="section-head">
+        <h2>Weather & Smart Suggestions</h2>
+      </div>
+      <div id="weatherLoading" class="spinner-wrap">
+        <div class="spinner"></div>
+        <p>Fetching weather...</p>
+      </div>
+      <div id="weatherContent" class="weather-content hidden">
+        <p><strong>Location:</strong> <span id="weatherLocation">-</span></p>
+        <p><strong>Temperature:</strong> <span id="weatherTemp">-</span></p>
+        <p><strong>Condition:</strong> <span id="weatherCondition">-</span></p>
+      </div>
+      <div>
+        <h3>Recommended for you</h3>
+        <div id="recommendedGrid" class="food-grid"></div>
+      </div>
+    </section>
+
+    <section class="categories-section">
+      <div class="section-head">
+        <h2>Categories</h2>
+      </div>
+      <div id="categoryList" class="categories"></div>
+    </section>
+
+    <section class="controls-section card">
+      <div class="section-head">
+        <h2>Filters</h2>
+      </div>
+      <div class="filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="low-calorie">Low calorie</button>
+        <button class="filter-btn" data-filter="high-protein">High protein</button>
+      </div>
+    </section>
+
+    <section class="items-section">
+      <div class="section-head">
+        <h2>Popular Food Items</h2>
+      </div>
+      <div id="foodGrid" class="food-grid"></div>
+    </section>
+  </main>
+
+  <aside id="cartPanel" class="cart-panel">
+    <div class="cart-header">
+      <h2>Your Cart</h2>
+      <button id="closeCart" class="icon-btn" aria-label="Close cart">✕</button>
+    </div>
+    <div id="cartItems" class="cart-items"></div>
+    <div class="cart-summary">
+      <p>Total Items: <span id="summaryItems">0</span></p>
+      <p>Total Price: $<span id="summaryPrice">0.00</span></p>
+      <p>Total Calories: <span id="summaryCalories">0</span> kcal</p>
+      <div id="calorieDashboard" class="calorie-dashboard green">
+        Today's Intake: <span id="intakeValue">0</span> calories
+      </div>
+    </div>
+  </aside>
+  <div id="cartOverlay" class="overlay"></div>
+
+  <template id="foodCardTemplate">
+    <article class="food-card">
+      <div class="food-image-wrap">
+        <img class="food-image" alt="" />
+      </div>
+      <div class="food-meta">
+        <h3 class="food-name"></h3>
+        <div class="food-details">
+          <span class="food-price"></span>
+          <span class="food-calories"></span>
+        </div>
+        <div class="food-tags"></div>
+        <button class="add-btn">Add to cart</button>
+      </div>
+    </article>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
