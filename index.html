@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QuickBite - Food Delivery</title>
+  <title>QuickBite | Local food delivery</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="navbar">
     <div class="logo">QuickBite</div>
     <div class="search-wrap">
-      <input id="searchInput" type="text" placeholder="Search food..." aria-label="Search food items" />
+      <input id="searchInput" type="text" placeholder="Search for pizza, salad, coffee..." aria-label="Search food items" />
     </div>
     <div class="nav-actions">
       <button id="darkModeToggle" class="icon-btn" aria-label="Toggle dark mode">🌙</button>
@@ -23,20 +23,20 @@
   <main>
     <section class="hero">
       <div class="hero-content">
-        <h1>Delicious food, delivered fast.</h1>
-        <p>Fresh meals, healthy choices, and comfort snacks for every mood.</p>
-        <button class="primary-btn" id="exploreBtn">Explore Menu</button>
+        <h1>Good food, right when you're hungry.</h1>
+        <p>From quick lunches to late-night cravings, we've got something you'll actually want to eat.</p>
+        <button class="primary-btn" id="exploreBtn">See what's cooking</button>
       </div>
       <div class="hero-banner" aria-hidden="true">🍕 🍔 🥗 🍨 ☕</div>
     </section>
 
     <section class="weather-section card">
       <div class="section-head">
-        <h2>Weather & Smart Suggestions</h2>
+        <h2>Weather picks for today</h2>
       </div>
       <div id="weatherLoading" class="spinner-wrap">
         <div class="spinner"></div>
-        <p>Fetching weather...</p>
+        <p>Checking weather near you...</p>
       </div>
       <div id="weatherContent" class="weather-content hidden">
         <p><strong>Location:</strong> <span id="weatherLocation">-</span></p>
@@ -44,32 +44,32 @@
         <p><strong>Condition:</strong> <span id="weatherCondition">-</span></p>
       </div>
       <div>
-        <h3>Recommended for you</h3>
+        <h3>You might like these</h3>
         <div id="recommendedGrid" class="food-grid"></div>
       </div>
     </section>
 
     <section class="categories-section">
       <div class="section-head">
-        <h2>Categories</h2>
+        <h2>Browse by category</h2>
       </div>
       <div id="categoryList" class="categories"></div>
     </section>
 
     <section class="controls-section card">
       <div class="section-head">
-        <h2>Filters</h2>
+        <h2>Quick filters</h2>
       </div>
       <div class="filters">
         <button class="filter-btn active" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="low-calorie">Low calorie</button>
-        <button class="filter-btn" data-filter="high-protein">High protein</button>
+        <button class="filter-btn" data-filter="low-calorie">Lighter meals</button>
+        <button class="filter-btn" data-filter="high-protein">Protein picks</button>
       </div>
     </section>
 
     <section class="items-section">
       <div class="section-head">
-        <h2>Popular Food Items</h2>
+        <h2>Popular right now</h2>
       </div>
       <div id="foodGrid" class="food-grid"></div>
     </section>
@@ -77,16 +77,16 @@
 
   <aside id="cartPanel" class="cart-panel">
     <div class="cart-header">
-      <h2>Your Cart</h2>
+      <h2>Your order</h2>
       <button id="closeCart" class="icon-btn" aria-label="Close cart">✕</button>
     </div>
     <div id="cartItems" class="cart-items"></div>
     <div class="cart-summary">
-      <p>Total Items: <span id="summaryItems">0</span></p>
-      <p>Total Price: $<span id="summaryPrice">0.00</span></p>
-      <p>Total Calories: <span id="summaryCalories">0</span> kcal</p>
+      <p>Items in cart: <span id="summaryItems">0</span></p>
+      <p>Estimated total: $<span id="summaryPrice">0.00</span></p>
+      <p>Calories total: <span id="summaryCalories">0</span> kcal</p>
       <div id="calorieDashboard" class="calorie-dashboard green">
-        Today's Intake: <span id="intakeValue">0</span> calories
+        Today's intake: <span id="intakeValue">0</span> calories
       </div>
     </div>
   </aside>
@@ -104,7 +104,7 @@
           <span class="food-calories"></span>
         </div>
         <div class="food-tags"></div>
-        <button class="add-btn">Add to cart</button>
+        <button class="add-btn">Add</button>
       </div>
     </article>
   </template>
