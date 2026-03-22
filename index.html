@@ -2,100 +2,171 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QuickBite | Local food delivery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QuickBite</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap"
+    rel="stylesheet"
+  />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="navbar">
-    <div class="logo">QuickBite</div>
-    <div class="search-wrap">
-      <input id="searchInput" type="text" placeholder="Search for pizza, salad, coffee..." aria-label="Search food items" />
-    </div>
-    <div class="nav-actions">
-      <button id="darkModeToggle" class="icon-btn" aria-label="Toggle dark mode">🌙</button>
-      <button id="cartToggle" class="cart-btn" aria-label="Open cart">
-        🛒 <span id="cartCount">0</span>
-      </button>
-    </div>
-  </header>
+  <div class="app-shell">
+    <header class="smart-header glass">
+      <div class="header-brand">
+        <span class="logo-mark">QB</span>
+        <div class="brand-text">
+          <span class="logo-title">QuickBite</span>
+          <span class="logo-sub">Dashboard</span>
+        </div>
+      </div>
 
-  <main>
-    <section class="hero">
-      <div class="hero-content">
-        <h1>Good food, right when you're hungry.</h1>
-        <p>From quick lunches to late-night cravings, we've got something you'll actually want to eat.</p>
-        <button class="primary-btn" id="exploreBtn">See what's cooking</button>
+      <div class="header-greeting">
+        <p id="greeting" class="greeting-line">Hi</p>
+        <p id="headerSuggestion" class="suggestion-line">…</p>
       </div>
-      <div class="hero-banner" aria-hidden="true">🍕 🍔 🥗 🍨 ☕</div>
-    </section>
 
-    <section class="weather-section card">
-      <div class="section-head">
-        <h2>Weather picks for today</h2>
+      <div class="header-weather glass-inner">
+        <div id="weatherLoading" class="weather-loading">
+          <span class="spinner tiny"></span>
+          <span>…</span>
+        </div>
+        <div id="weatherContent" class="weather-inline hidden">
+          <span class="weather-icon" id="weatherIcon">☀️</span>
+          <div class="weather-meta">
+            <strong id="weatherTemp">—</strong>
+            <span id="weatherCondition">—</span>
+          </div>
+          <span class="weather-loc" id="weatherLocation">—</span>
+        </div>
       </div>
-      <div id="weatherLoading" class="spinner-wrap">
-        <div class="spinner"></div>
-        <p>Checking weather near you...</p>
+
+      <div class="header-search">
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="Search…"
+          aria-label="Search"
+          autocomplete="off"
+        />
       </div>
-      <div id="weatherContent" class="weather-content hidden">
-        <p><strong>Location:</strong> <span id="weatherLocation">-</span></p>
-        <p><strong>Temperature:</strong> <span id="weatherTemp">-</span></p>
-        <p><strong>Condition:</strong> <span id="weatherCondition">-</span></p>
+
+      <div class="header-actions">
+        <button type="button" id="darkModeToggle" class="icon-btn" aria-label="Dark mode">🌙</button>
+        <button type="button" id="cartToggle" class="cart-btn" aria-label="Open cart">
+          <span class="cart-ico">🛒</span>
+          <span id="cartCount" class="cart-badge">0</span>
+        </button>
       </div>
-      <div>
-        <h3>You might like these</h3>
+    </header>
+
+    <main class="dashboard-main">
+      <section class="hero-dashboard glass">
+        <div class="hero-copy">
+          <h1>Order fast</h1>
+          <p>Weather picks, mood, live calories.</p>
+          <button type="button" class="primary-btn" id="exploreBtn">Menu</button>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="float-emoji">🍜</div>
+          <div class="float-emoji delay">🥗</div>
+          <div class="float-emoji delay2">🧋</div>
+        </div>
+      </section>
+
+      <section class="mood-section glass">
+        <div class="section-head">
+          <h2>Mood</h2>
+          <p class="section-sub">+ weather = picks</p>
+        </div>
+        <div class="mood-grid" role="group" aria-label="Mood selector">
+          <button type="button" class="mood-btn" data-mood="happy">😊 Happy</button>
+          <button type="button" class="mood-btn" data-mood="stressed">😮‍💨 Stressed</button>
+          <button type="button" class="mood-btn" data-mood="lazy">🛋 Lazy</button>
+          <button type="button" class="mood-btn" data-mood="energetic">⚡ Energetic</button>
+          <button type="button" class="mood-btn mood-clear active" data-mood="">Any</button>
+        </div>
+      </section>
+
+      <section class="smart-picks card-glass">
+        <div class="section-head">
+          <h2>Smart picks</h2>
+          <p class="section-sub" id="smartPicksHint">…</p>
+        </div>
         <div id="recommendedGrid" class="food-grid"></div>
-      </div>
-    </section>
+      </section>
 
-    <section class="categories-section">
-      <div class="section-head">
-        <h2>Browse by category</h2>
-      </div>
-      <div id="categoryList" class="categories"></div>
-    </section>
+      <section class="categories-section">
+        <div class="section-head">
+          <h2>Categories</h2>
+        </div>
+        <div id="categoryList" class="categories"></div>
+      </section>
 
-    <section class="controls-section card">
-      <div class="section-head">
-        <h2>Quick filters</h2>
-      </div>
-      <div class="filters">
-        <button class="filter-btn active" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="low-calorie">Lighter meals</button>
-        <button class="filter-btn" data-filter="high-protein">Protein picks</button>
-      </div>
-    </section>
+      <section class="controls-section card-glass">
+        <div class="section-head">
+          <h2>Filters</h2>
+          <p class="section-sub">Weather = forecast</p>
+        </div>
+        <div class="filters" role="toolbar" aria-label="Menu filters">
+          <button type="button" class="filter-btn active" data-filter="all">All</button>
+          <button type="button" class="filter-btn" data-filter="low-calorie">Low cal</button>
+          <button type="button" class="filter-btn" data-filter="high-protein">High protein</button>
+          <button type="button" class="filter-btn" data-filter="weather">Weather</button>
+        </div>
+      </section>
 
-    <section class="items-section">
-      <div class="section-head">
-        <h2>Popular right now</h2>
-      </div>
-      <div id="foodGrid" class="food-grid"></div>
-    </section>
-  </main>
+      <section class="items-section">
+        <div class="section-head">
+          <h2>Menu</h2>
+        </div>
+        <div id="foodGrid" class="food-grid"></div>
+      </section>
+    </main>
+  </div>
 
-  <aside id="cartPanel" class="cart-panel">
+  <div
+    id="calorieFloat"
+    class="calorie-float glass"
+    aria-live="polite"
+    role="button"
+    tabindex="0"
+    aria-label="Open cart"
+  >
+    <div class="calorie-float-head">
+      <span class="calorie-float-label">Calories</span>
+      <span id="floatCalorieValue" class="calorie-float-value">0</span>
+    </div>
+    <div class="calorie-float-bar">
+      <div id="floatCalorieBar" class="calorie-float-fill" style="width: 0%"></div>
+    </div>
+    <p id="floatCalorieHint" class="calorie-float-hint">Add items</p>
+  </div>
+
+  <aside id="cartPanel" class="cart-panel glass">
     <div class="cart-header">
-      <h2>Your order</h2>
-      <button id="closeCart" class="icon-btn" aria-label="Close cart">✕</button>
+      <h2>Cart</h2>
+      <button type="button" id="closeCart" class="icon-btn" aria-label="Close cart">✕</button>
+    </div>
+    <div id="cartCalorieWarning" class="cart-warning hidden" role="alert">
+      <strong>Warning</strong>
+      <span>Over 2000 kcal in cart.</span>
     </div>
     <div id="cartItems" class="cart-items"></div>
     <div class="cart-summary">
-      <p>Items in cart: <span id="summaryItems">0</span></p>
-      <p>Estimated total: $<span id="summaryPrice">0.00</span></p>
-      <p>Calories total: <span id="summaryCalories">0</span> kcal</p>
-      <div id="calorieDashboard" class="calorie-dashboard green">
-        Today's intake: <span id="intakeValue">0</span> calories
-      </div>
+      <p>Items: <strong id="summaryItems">0</strong></p>
+      <p>Total: <strong><span id="summaryPrice">₹0</span></strong></p>
+      <p>Cal: <strong><span id="summaryCalories">0</span> kcal</strong></p>
     </div>
   </aside>
+
   <div id="cartOverlay" class="overlay"></div>
 
   <template id="foodCardTemplate">
     <article class="food-card">
       <div class="food-image-wrap">
-        <img class="food-image" alt="" />
+        <span class="health-badge"></span>
+        <img class="food-image" alt="" loading="lazy" />
       </div>
       <div class="food-meta">
         <h3 class="food-name"></h3>
@@ -104,7 +175,7 @@
           <span class="food-calories"></span>
         </div>
         <div class="food-tags"></div>
-        <button class="add-btn">Add</button>
+        <button type="button" class="add-btn">Add</button>
       </div>
     </article>
   </template>

@@ -1,334 +1,503 @@
-// Local food catalog with tags used for filters and weather suggestions.
-const FOOD_ITEMS = [
-  { id: "f1", name: "Margherita Pizza", price: 11.99, calories: 780, category: "Pizza", tags: ["high-protein"], image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=900&auto=format&fit=crop" },
-  { id: "f2", name: "Chicken Burger", price: 8.49, calories: 640, category: "Burger", tags: ["high-protein"], image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=900&auto=format&fit=crop" },
-  { id: "f3", name: "Quinoa Bowl", price: 10.25, calories: 420, category: "Healthy", tags: ["low-calorie", "high-protein"], image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=900&auto=format&fit=crop" },
-  { id: "f4", name: "Ice Cream Sundae", price: 5.2, calories: 360, category: "Desserts", tags: ["low-calorie"], image: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?q=80&w=900&auto=format&fit=crop" },
-  { id: "f5", name: "Tomato Soup", price: 6.1, calories: 210, category: "Soups", tags: ["low-calorie"], image: "https://images.unsplash.com/photo-1547592180-85f173990554?q=80&w=900&auto=format&fit=crop" },
-  { id: "f6", name: "Iced Mango Juice", price: 4.75, calories: 160, category: "Drinks", tags: ["low-calorie"], image: "https://images.unsplash.com/photo-1600271886742-f049cd5bba3f?q=80&w=900&auto=format&fit=crop" },
-  { id: "f7", name: "French Fries", price: 3.99, calories: 420, category: "Snacks", tags: [], image: "https://images.unsplash.com/photo-1576107232684-1279f390859f?q=80&w=900&auto=format&fit=crop" },
-  { id: "f8", name: "Cappuccino", price: 3.25, calories: 140, category: "Drinks", tags: ["low-calorie"], image: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=900&auto=format&fit=crop" },
-  { id: "f9", name: "Protein Wrap", price: 7.8, calories: 390, category: "Healthy", tags: ["high-protein"], image: "https://images.unsplash.com/photo-1585238342024-78d387f4a707?q=80&w=900&auto=format&fit=crop" },
-  { id: "f10", name: "Chocolate Brownie", price: 4.35, calories: 310, category: "Desserts", tags: [], image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476d?q=80&w=900&auto=format&fit=crop" }
+const $ = (id) => document.getElementById(id);
+const CAP = 2000;
+const BAR = 2500;
+
+/** Format amount in Indian Rupees */
+function rupees(amount) {
+  return "₹" + Number(amount).toLocaleString("en-IN", { maximumFractionDigits: 0 });
+}
+const U = "https://images.unsplash.com/";
+const Q = "?q=80&w=900&auto=format&fit=crop";
+
+const F = [
+  {
+    id: "f1",
+    name: "Margherita Pizza",
+    price: 995,
+    calories: 780,
+    category: "Pizza",
+    healthType: "junk",
+    tags: ["high-protein"],
+    weatherFit: ["moderate", "rainy", "cold"],
+    moodFit: ["happy", "lazy"],
+    i: U + "photo-1513104890138-7c749659a591" + Q
+  },
+  {
+    id: "f2",
+    name: "Chicken Burger",
+    price: 705,
+    calories: 640,
+    category: "Burger",
+    healthType: "junk",
+    tags: ["high-protein"],
+    weatherFit: ["hot", "moderate"],
+    moodFit: ["stressed", "lazy", "happy"],
+    i: U + "photo-1568901346375-23c9450c58cd" + Q
+  },
+  {
+    id: "f3",
+    name: "Quinoa Power Bowl",
+    price: 851,
+    calories: 420,
+    category: "Healthy",
+    healthType: "healthy",
+    tags: ["low-calorie", "high-protein"],
+    weatherFit: ["hot", "moderate", "cold", "rainy"],
+    moodFit: ["energetic", "happy"],
+    i: U + "photo-1512621776951-a57141f2eefd" + Q
+  },
+  {
+    id: "f4",
+    name: "Ice Cream Sundae",
+    price: 432,
+    calories: 360,
+    category: "Desserts",
+    healthType: "junk",
+    tags: [],
+    weatherFit: ["hot"],
+    moodFit: ["happy", "stressed"],
+    i: U + "photo-1563805042-7684c019e1cb" + Q
+  },
+  {
+    id: "f5",
+    name: "Tomato Basil Soup",
+    price: 506,
+    calories: 210,
+    category: "Soups",
+    healthType: "healthy",
+    tags: ["low-calorie"],
+    weatherFit: ["cold", "rainy"],
+    moodFit: ["stressed", "lazy"],
+    i: U + "photo-1547592180-85f173990554" + Q
+  },
+  {
+    id: "f6",
+    name: "Iced Mango Juice",
+    price: 394,
+    calories: 160,
+    category: "Drinks",
+    healthType: "healthy",
+    tags: ["low-calorie"],
+    weatherFit: ["hot"],
+    moodFit: ["happy", "energetic", "lazy"],
+    i: U + "photo-1600271886742-f049cd5bba3f" + Q
+  },
+  {
+    id: "f7",
+    name: "French Fries",
+    price: 331,
+    calories: 420,
+    category: "Snacks",
+    healthType: "junk",
+    tags: [],
+    weatherFit: ["moderate", "rainy", "hot"],
+    moodFit: ["lazy", "happy", "stressed"],
+    i: U + "photo-1576107232684-1279f390859f" + Q
+  },
+  {
+    id: "f8",
+    name: "Cappuccino",
+    price: 270,
+    calories: 140,
+    category: "Drinks",
+    healthType: "healthy",
+    tags: ["low-calorie"],
+    weatherFit: ["cold", "rainy", "moderate"],
+    moodFit: ["lazy", "stressed", "energetic"],
+    i: U + "photo-1509042239860-f550ce710b93" + Q
+  },
+  {
+    id: "f9",
+    name: "Protein Wrap",
+    price: 647,
+    calories: 390,
+    category: "Healthy",
+    healthType: "healthy",
+    tags: ["high-protein", "low-calorie"],
+    weatherFit: ["hot", "moderate"],
+    moodFit: ["energetic", "lazy"],
+    i: U + "photo-1585238342024-78d387f4a707" + Q
+  },
+  {
+    id: "f10",
+    name: "Chocolate Brownie",
+    price: 361,
+    calories: 310,
+    category: "Desserts",
+    healthType: "junk",
+    tags: [],
+    weatherFit: ["rainy", "cold", "moderate"],
+    moodFit: ["stressed", "happy"],
+    i: U + "photo-1606313564200-e75d5e30476d" + Q
+  },
+  {
+    id: "f11",
+    name: "Grilled Salmon Plate",
+    price: 1204,
+    calories: 520,
+    category: "Healthy",
+    healthType: "healthy",
+    tags: ["high-protein", "low-calorie"],
+    weatherFit: ["moderate", "hot"],
+    moodFit: ["energetic", "happy"],
+    i: U + "photo-1467003909585-2f8a72700288" + Q
+  },
+  {
+    id: "f12",
+    name: "Crispy Fried Chicken",
+    price: 829,
+    calories: 890,
+    category: "Comfort",
+    healthType: "junk",
+    tags: ["high-protein"],
+    weatherFit: ["rainy", "cold", "moderate"],
+    moodFit: ["stressed", "lazy"],
+    i: U + "photo-1626082927389-6cd097cdc6ec" + Q
+  },
+  {
+    id: "f13",
+    name: "Green Smoothie",
+    price: 457,
+    calories: 180,
+    category: "Drinks",
+    healthType: "healthy",
+    tags: ["low-calorie", "high-protein"],
+    weatherFit: ["hot", "moderate"],
+    moodFit: ["energetic", "happy"],
+    i: U + "photo-1610970881699-44a5587cabec" + Q
+  },
+  {
+    id: "f14",
+    name: "Spicy Ramen Bowl",
+    price: 768,
+    calories: 680,
+    category: "Bowls",
+    healthType: "junk",
+    tags: ["high-protein"],
+    weatherFit: ["cold", "rainy"],
+    moodFit: ["stressed", "lazy", "happy"],
+    i: U + "photo-1569718212165-3a8278d5f624" + Q
+  }
 ];
 
-const state = {
+const S = {
   category: "All",
   filter: "all",
   search: "",
-  cart: JSON.parse(localStorage.getItem("quickbite-cart") || "[]"),
-  weatherType: "moderate"
+  mood: "",
+  weatherType: "moderate",
+  conditionLabel: "Pleasant",
+  cart: (() => {
+    try {
+      return JSON.parse(localStorage.getItem("quickbite-cart") || "[]");
+    } catch {
+      return [];
+    }
+  })()
 };
 
-const els = {
-  categoryList: document.getElementById("categoryList"),
-  foodGrid: document.getElementById("foodGrid"),
-  recommendedGrid: document.getElementById("recommendedGrid"),
-  searchInput: document.getElementById("searchInput"),
-  cartItems: document.getElementById("cartItems"),
-  summaryItems: document.getElementById("summaryItems"),
-  summaryPrice: document.getElementById("summaryPrice"),
-  summaryCalories: document.getElementById("summaryCalories"),
-  intakeValue: document.getElementById("intakeValue"),
-  calorieDashboard: document.getElementById("calorieDashboard"),
-  cartCount: document.getElementById("cartCount"),
-  cartPanel: document.getElementById("cartPanel"),
-  cartToggle: document.getElementById("cartToggle"),
-  closeCart: document.getElementById("closeCart"),
-  cartOverlay: document.getElementById("cartOverlay"),
-  weatherLoading: document.getElementById("weatherLoading"),
-  weatherContent: document.getElementById("weatherContent"),
-  weatherLocation: document.getElementById("weatherLocation"),
-  weatherTemp: document.getElementById("weatherTemp"),
-  weatherCondition: document.getElementById("weatherCondition"),
-  darkModeToggle: document.getElementById("darkModeToggle"),
-  exploreBtn: document.getElementById("exploreBtn"),
-  foodCardTemplate: document.getElementById("foodCardTemplate")
+const T = { "low-calorie": "Low calorie", "high-protein": "High protein" };
+const M = { happy: "Happy", stressed: "Stressed", lazy: "Lazy", energetic: "Energetic" };
+const W = {
+  hot: "Heatwave: cold drinks & light plates.",
+  cold: "Chilly: warm bowls & sips.",
+  rainy: "Rainy: comfort food.",
+  moderate: "Nice day: mix healthy + treat."
 };
 
-function setup() {
-  initTheme();
-  renderCategories();
-  renderFoodGrid();
-  renderCart();
-  attachEvents();
-  fetchWeatherAndRecommend();
+const tpl = $("foodCardTemplate").content.firstElementChild;
+
+function totals() {
+  let n = 0;
+  let p = 0;
+  let c = 0;
+  S.cart.forEach((e) => {
+    const x = F.find((f) => f.id === e.id);
+    if (x) {
+      n += e.qty;
+      p += x.price * e.qty;
+      c += x.calories * e.qty;
+    }
+  });
+  return { n, p, c };
 }
 
-function initTheme() {
-  const dark = localStorage.getItem("quickbite-theme") === "dark";
-  document.body.classList.toggle("dark", dark);
-  els.darkModeToggle.textContent = dark ? "☀️" : "🌙";
+function pickScore(x) {
+  let s = x.weatherFit.includes(S.weatherType) ? 3 : 0;
+  if (S.mood && x.moodFit.includes(S.mood)) s += 2;
+  if (x.healthType === "healthy") s += 0.5;
+  return s;
 }
 
-function attachEvents() {
-  els.searchInput.addEventListener("input", (e) => {
-    state.search = e.target.value.trim().toLowerCase();
-    renderFoodGrid();
-  });
-
-  document.querySelectorAll(".filter-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      state.filter = btn.dataset.filter;
-      renderFoodGrid();
-    });
-  });
-
-  els.cartToggle.addEventListener("click", openCart);
-  els.closeCart.addEventListener("click", closeCart);
-  els.cartOverlay.addEventListener("click", closeCart);
-  els.darkModeToggle.addEventListener("click", toggleDarkMode);
-  els.exploreBtn.addEventListener("click", () => {
-    document.querySelector(".items-section").scrollIntoView({ behavior: "smooth" });
-  });
+function smartPicks(limit = 6) {
+  return [...F].sort((a, b) => pickScore(b) - pickScore(a)).slice(0, limit);
 }
 
-function renderCategories() {
-  const categories = ["All", ...new Set(FOOD_ITEMS.map((item) => item.category))];
-  els.categoryList.innerHTML = "";
-
-  categories.forEach((category) => {
-    const chip = document.createElement("button");
-    chip.className = `category-chip ${state.category === category ? "active" : ""}`;
-    chip.textContent = category;
-    chip.addEventListener("click", () => {
-      state.category = category;
-      document.querySelectorAll(".category-chip").forEach((c) => c.classList.remove("active"));
-      chip.classList.add("active");
-      renderFoodGrid();
-    });
-    els.categoryList.appendChild(chip);
+function filterList(items) {
+  return items.filter((x) => {
+    if (S.category !== "All" && x.category !== S.category) return false;
+    if (!x.name.toLowerCase().includes(S.search)) return false;
+    if (S.filter === "low-calorie" && !x.tags.includes("low-calorie")) return false;
+    if (S.filter === "high-protein" && !x.tags.includes("high-protein")) return false;
+    if (S.filter === "weather" && !x.weatherFit.includes(S.weatherType)) return false;
+    return true;
   });
 }
 
-function getFilteredFood(items) {
-  return items.filter((item) => {
-    const categoryMatch = state.category === "All" || item.category === state.category;
-    const searchMatch = item.name.toLowerCase().includes(state.search);
-    const filterMatch =
-      state.filter === "all" ||
-      (state.filter === "low-calorie" && item.tags.includes("low-calorie")) ||
-      (state.filter === "high-protein" && item.tags.includes("high-protein"));
-
-    return categoryMatch && searchMatch && filterMatch;
-  });
+function head() {
+  const w = W[S.weatherType] || W.moderate;
+  $("headerSuggestion").textContent = S.mood ? `${w} Mood: ${M[S.mood]}.` : w;
+  $("smartPicksHint").textContent = `${S.mood ? `Mood: ${M[S.mood]}. ` : "Any mood. "}Weather: ${S.conditionLabel} (${S.weatherType}).`;
 }
 
-function humanizeTag(tag) {
-  if (tag === "low-calorie") return "Low calorie";
-  if (tag === "high-protein") return "High protein";
-  return tag;
-}
+function card(item, el, options = {}) {
+  const { btn = "Add to cart", anim = 1 } = options;
+  const node = tpl.cloneNode(true);
+  const im = node.querySelector(".food-image");
+  const hb = node.querySelector(".health-badge");
+  const tw = node.querySelector(".food-tags");
+  const ab = node.querySelector(".add-btn");
 
-function createFoodCard(item, target, buttonText = "Add") {
-  const card = els.foodCardTemplate.content.firstElementChild.cloneNode(true);
-  const image = card.querySelector(".food-image");
-  const name = card.querySelector(".food-name");
-  const price = card.querySelector(".food-price");
-  const calories = card.querySelector(".food-calories");
-  const tagsWrap = card.querySelector(".food-tags");
-  const addBtn = card.querySelector(".add-btn");
-
-  image.src = item.image;
-  image.alt = item.name;
-  name.textContent = item.name;
-  price.textContent = `$${item.price.toFixed(2)}`;
-  calories.textContent = `${item.calories} kcal`;
-  addBtn.textContent = buttonText;
-
-  tagsWrap.innerHTML = "";
-  item.tags.forEach((tag) => {
+  im.src = item.i;
+  im.alt = item.name;
+  node.querySelector(".food-name").textContent = item.name;
+  node.querySelector(".food-price").textContent = rupees(item.price);
+  node.querySelector(".food-calories").textContent = item.calories + " kcal";
+  ab.textContent = btn;
+  hb.textContent = item.healthType === "healthy" ? "Healthy" : "Junk";
+  hb.classList.toggle("is-junk", item.healthType === "junk");
+  tw.innerHTML = "";
+  item.tags.forEach((t) => {
     const span = document.createElement("span");
     span.className = "tag";
-    span.textContent = humanizeTag(tag);
-    tagsWrap.appendChild(span);
+    span.textContent = T[t] || t;
+    tw.appendChild(span);
   });
+  ab.onclick = () => {
+    add(item.id);
+    ab.classList.add("added");
+    setTimeout(() => ab.classList.remove("added"), 360);
+  };
+  if (anim) node.classList.add("food-card-enter");
+  el.appendChild(node);
+}
 
-  addBtn.addEventListener("click", () => {
-    addToCart(item.id);
-    addBtn.classList.add("added");
-    window.setTimeout(() => addBtn.classList.remove("added"), 360);
+function grid() {
+  const g = $("foodGrid");
+  const list = filterList(F);
+  g.innerHTML = list.length ? "" : '<p class="empty-hint">No matches.</p>';
+  list.forEach((x) => card(x, g, { anim: 0 }));
+}
+
+function recs() {
+  const g = $("recommendedGrid");
+  g.innerHTML = "";
+  smartPicks().forEach((x) => card(x, g, { btn: "Add", anim: 1 }));
+}
+
+function cats() {
+  const categories = ["All", ...new Set(F.map((x) => x.category))];
+  const wrap = $("categoryList");
+  wrap.innerHTML = "";
+  categories.forEach((name) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "category-chip" + (S.category === name ? " active" : "");
+    b.textContent = name;
+    b.onclick = () => {
+      S.category = name;
+      document.querySelectorAll(".category-chip").forEach((el) => el.classList.remove("active"));
+      b.classList.add("active");
+      grid();
+    };
+    wrap.appendChild(b);
   });
-
-  target.appendChild(card);
 }
 
-function renderFoodGrid() {
-  els.foodGrid.innerHTML = "";
-  const items = getFilteredFood(FOOD_ITEMS);
-
-  if (items.length === 0) {
-    els.foodGrid.innerHTML = "<p>No dishes match that search. Try another keyword.</p>";
-    return;
-  }
-
-  items.forEach((item) => createFoodCard(item, els.foodGrid));
+function add(id) {
+  const row = S.cart.find((x) => x.id === id);
+  if (row) row.qty += 1;
+  else S.cart.push({ id, qty: 1 });
+  localStorage.setItem("quickbite-cart", JSON.stringify(S.cart));
+  paint();
 }
 
-function addToCart(foodId) {
-  const existing = state.cart.find((entry) => entry.id === foodId);
-  if (existing) {
-    existing.qty += 1;
-  } else {
-    state.cart.push({ id: foodId, qty: 1 });
-  }
-  persistCart();
-  renderCart();
+function sub(id) {
+  const i = S.cart.findIndex((x) => x.id === id);
+  if (i < 0) return;
+  if (S.cart[i].qty > 1) S.cart[i].qty -= 1;
+  else S.cart.splice(i, 1);
+  localStorage.setItem("quickbite-cart", JSON.stringify(S.cart));
+  paint();
 }
 
-function removeFromCart(foodId) {
-  const idx = state.cart.findIndex((entry) => entry.id === foodId);
-  if (idx === -1) return;
-  if (state.cart[idx].qty > 1) {
-    state.cart[idx].qty -= 1;
-  } else {
-    state.cart.splice(idx, 1);
-  }
-  persistCart();
-  renderCart();
-}
-
-function renderCart() {
-  els.cartItems.innerHTML = "";
-  let totalItems = 0;
-  let totalPrice = 0;
-  let totalCalories = 0;
-
-  state.cart.forEach((entry) => {
-    const item = FOOD_ITEMS.find((food) => food.id === entry.id);
-    if (!item) return;
-
-    totalItems += entry.qty;
-    totalPrice += item.price * entry.qty;
-    totalCalories += item.calories * entry.qty;
-
-    const row = document.createElement("article");
-    row.className = "cart-item";
-    row.innerHTML = `
-      <img src="${item.image}" alt="${item.name}">
+function paint() {
+  const { n, p, c } = totals();
+  const ci = $("cartItems");
+  ci.innerHTML = "";
+  S.cart.forEach((e) => {
+    const x = F.find((f) => f.id === e.id);
+    if (!x) return;
+    const r = document.createElement("article");
+    r.className = "cart-item";
+    r.innerHTML = `
+      <img src="${x.i}" alt="${x.name}">
       <div>
-        <strong>${item.name}</strong>
-        <p>$${item.price.toFixed(2)} x ${entry.qty} | ${item.calories} kcal</p>
+        <strong>${x.name}</strong>
+        <p>${rupees(x.price)} × ${e.qty}</p>
       </div>
-      <button class="icon-btn" aria-label="Remove one item">−</button>
+      <button type="button" class="icon-btn" aria-label="Remove one">−</button>
     `;
-    row.querySelector("button").addEventListener("click", () => removeFromCart(item.id));
-    els.cartItems.appendChild(row);
+    r.querySelector("button").onclick = () => sub(x.id);
+    ci.appendChild(r);
   });
+  if (!S.cart.length) ci.innerHTML = '<p class="empty-hint">Cart empty.</p>';
 
-  if (state.cart.length === 0) {
-    els.cartItems.innerHTML = "<p>Your cart is empty for now. Add something tasty.</p>";
+  $("summaryItems").textContent = n;
+  $("summaryPrice").textContent = rupees(p);
+  $("summaryCalories").textContent = c;
+  $("cartCount").textContent = n;
+  $("cartCalorieWarning").classList.toggle("hidden", c <= CAP);
+  $("floatCalorieValue").textContent = c;
+  $("floatCalorieBar").style.width = Math.min(100, (c / BAR) * 100) + "%";
+
+  const level = c <= 800 ? "green" : c <= CAP ? "yellow" : "red";
+  $("calorieFloat").className = "calorie-float glass level-" + level;
+  $("floatCalorieHint").textContent = !c
+    ? "Add items."
+    : c > CAP
+      ? "Over " + CAP + " kcal."
+      : c <= 800
+        ? "Light."
+        : "Moderate.";
+}
+
+function greet() {
+  const h = new Date().getHours();
+  const part =
+    h < 5 ? "Late night" : h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : h < 21 ? "Good evening" : "Good night";
+  $("greeting").textContent = part + " — hungry?";
+}
+
+function rainCode(code) {
+  return [51, 53, 55, 61, 63, 65, 80, 81, 82, 95, 96, 99].includes(code) ? "rainy" : "clear";
+}
+
+function wxType(bucket, temp) {
+  return bucket === "rainy" ? "rainy" : temp <= 12 ? "cold" : temp >= 28 ? "hot" : "moderate";
+}
+
+function cond(bucket, temp) {
+  if (bucket === "rainy") return { l: "Rainy", i: "🌧️" };
+  if (temp <= 12) return { l: "Cold", i: "🧣" };
+  if (temp >= 28) return { l: "Hot", i: "☀️" };
+  return { l: "Pleasant", i: "⛅" };
+}
+
+async function wx() {
+  try {
+    const loc = await (await fetch("https://ipapi.co/json/")).json();
+    const d = await (
+      await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}&longitude=${loc.longitude}&current_weather=true&timezone=auto`
+      )
+    ).json();
+    const t = d?.current_weather?.temperature ?? 22;
+    const cd = d?.current_weather?.weathercode ?? 0;
+    const b = rainCode(cd);
+    const { l, i } = cond(b, t);
+    S.weatherType = wxType(b, t);
+    S.conditionLabel = l;
+    $("weatherIcon").textContent = i;
+    $("weatherTemp").textContent = Math.round(t) + "°C";
+    $("weatherCondition").textContent = l;
+    $("weatherLocation").textContent = loc.city || "Area";
+  } catch {
+    S.weatherType = "moderate";
+    S.conditionLabel = "Pleasant";
+    $("weatherIcon").textContent = "⛅";
+    $("weatherTemp").textContent = "—";
+    $("weatherCondition").textContent = "Demo";
+    $("weatherLocation").textContent = "Nearby";
   }
-
-  els.summaryItems.textContent = String(totalItems);
-  els.summaryPrice.textContent = totalPrice.toFixed(2);
-  els.summaryCalories.textContent = String(totalCalories);
-  els.intakeValue.textContent = String(totalCalories);
-  els.cartCount.textContent = String(totalItems);
-
-  const level = getCalorieLevel(totalCalories);
-  els.calorieDashboard.className = `calorie-dashboard ${level}`;
+  $("weatherLoading").classList.add("hidden");
+  $("weatherContent").classList.remove("hidden");
+  head();
+  recs();
+  grid();
 }
 
-function getCalorieLevel(calories) {
-  if (calories <= 1200) return "green";
-  if (calories <= 2200) return "yellow";
-  return "red";
-}
-
-function persistCart() {
-  localStorage.setItem("quickbite-cart", JSON.stringify(state.cart));
-}
-
-function toggleDarkMode() {
-  const nowDark = !document.body.classList.contains("dark");
-  document.body.classList.toggle("dark", nowDark);
-  localStorage.setItem("quickbite-theme", nowDark ? "dark" : "light");
-  els.darkModeToggle.textContent = nowDark ? "☀️" : "🌙";
+function theme() {
+  const dark = localStorage.getItem("quickbite-theme") === "dark";
+  document.body.classList.toggle("dark", dark);
+  $("darkModeToggle").textContent = dark ? "☀️" : "🌙";
 }
 
 function openCart() {
-  els.cartPanel.classList.add("open");
-  els.cartOverlay.classList.add("visible");
+  $("cartPanel").classList.add("open");
+  $("cartOverlay").classList.add("visible");
 }
 
 function closeCart() {
-  els.cartPanel.classList.remove("open");
-  els.cartOverlay.classList.remove("visible");
+  $("cartPanel").classList.remove("open");
+  $("cartOverlay").classList.remove("visible");
 }
 
-function mapWeatherCodeToCondition(code) {
-  if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) return "rainy";
-  return "clear";
-}
+/* Events */
+document.querySelectorAll(".filter-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    S.filter = btn.dataset.filter;
+    grid();
+  });
+});
 
-function conditionLabel(type, temp) {
-  if (type === "rainy") return "Rainy";
-  if (temp <= 16) return "Cold";
-  if (temp >= 30) return "Hot";
-  return "Pleasant";
-}
+document.querySelectorAll(".mood-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".mood-btn").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    S.mood = btn.dataset.mood || "";
+    head();
+    recs();
+  });
+});
 
-function weatherRecommendationType(type, temp) {
-  if (type === "rainy") return "rainy";
-  if (temp <= 16) return "cold";
-  if (temp >= 30) return "hot";
-  return "moderate";
-}
+$("searchInput").oninput = (e) => {
+  S.search = e.target.value.trim().toLowerCase();
+  grid();
+};
 
-function getRecommendedItems(weatherType) {
-  if (weatherType === "cold") {
-    return FOOD_ITEMS.filter((f) => ["Soups", "Drinks"].includes(f.category) && ["Tomato Soup", "Cappuccino"].includes(f.name));
+$("cartToggle").onclick = openCart;
+$("closeCart").onclick = closeCart;
+$("cartOverlay").onclick = closeCart;
+
+$("darkModeToggle").onclick = () => {
+  const dark = !document.body.classList.contains("dark");
+  document.body.classList.toggle("dark", dark);
+  localStorage.setItem("quickbite-theme", dark ? "dark" : "light");
+  $("darkModeToggle").textContent = dark ? "☀️" : "🌙";
+};
+
+$("exploreBtn").onclick = () => {
+  document.querySelector(".items-section").scrollIntoView({ behavior: "smooth" });
+};
+
+const calorieFloat = $("calorieFloat");
+calorieFloat.onclick = openCart;
+calorieFloat.onkeydown = (e) => {
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    openCart();
   }
-  if (weatherType === "hot") {
-    return FOOD_ITEMS.filter((f) => ["Iced Mango Juice", "Ice Cream Sundae"].includes(f.name));
-  }
-  if (weatherType === "rainy") {
-    return FOOD_ITEMS.filter((f) => f.category === "Snacks" || f.name === "Chicken Burger");
-  }
-  return FOOD_ITEMS.filter((f) => ["Healthy", "Pizza"].includes(f.category)).slice(0, 3);
-}
+};
 
-function renderRecommendations() {
-  els.recommendedGrid.innerHTML = "";
-  const items = getRecommendedItems(state.weatherType);
-  items.forEach((item) => createFoodCard(item, els.recommendedGrid, "Add"));
-}
 
-async function fetchWeatherAndRecommend() {
-  try {
-    // Geolocation from IP + weather from Open-Meteo (public API, no key).
-    const locationRes = await fetch("https://ipapi.co/json/");
-    const location = await locationRes.json();
-    const { latitude, longitude, city } = location;
-
-    const weatherUrl =
-      `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&timezone=auto`;
-    const weatherRes = await fetch(weatherUrl);
-    const weatherData = await weatherRes.json();
-    const temp = weatherData?.current_weather?.temperature ?? 24;
-    const weatherCode = weatherData?.current_weather?.weathercode ?? 0;
-
-    const shortCondition = mapWeatherCodeToCondition(weatherCode);
-    const condition = conditionLabel(shortCondition, temp);
-    state.weatherType = weatherRecommendationType(shortCondition, temp);
-
-    els.weatherLocation.textContent = city || "Your Area";
-    els.weatherTemp.textContent = `${temp}°C`;
-    els.weatherCondition.textContent = condition;
-  } catch (error) {
-    // Fallback keeps the app useful even without network/API access.
-    state.weatherType = "moderate";
-    els.weatherLocation.textContent = "Nearby";
-    els.weatherTemp.textContent = "N/A";
-    els.weatherCondition.textContent = "Pleasant";
-  } finally {
-    els.weatherLoading.classList.add("hidden");
-    els.weatherContent.classList.remove("hidden");
-    renderRecommendations();
-  }
-}
-
-setup();
+theme();
+greet();
+head();
+cats();
+grid();
+recs();
+paint();
+wx();
