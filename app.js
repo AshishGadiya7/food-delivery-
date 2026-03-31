@@ -1,15 +1,15 @@
 const $ = (id) => document.getElementById(id);
 const CAP = 2000;
 const BAR = 2500;
+const API = "/api";
 
-/** Format amount in Indian Rupees */
 function rupees(amount) {
   return "₹" + Number(amount).toLocaleString("en-IN", { maximumFractionDigits: 0 });
 }
+
 const U = "https://images.unsplash.com/";
 const Q = "?q=80&w=900&auto=format&fit=crop";
-
-const F = [
+const FALLBACK_FOODS = [
   {
     id: "f1",
     name: "Margherita Pizza",
@@ -187,13 +187,10 @@ const S = {
   mood: "",
   weatherType: "moderate",
   conditionLabel: "Pleasant",
-  cart: (() => {
-    try {
-      return JSON.parse(localStorage.getItem("quickbite-cart") || "[]");
-    } catch {
-      return [];
-    }
-  })()
+  cart: [],
+  token: localStorage.getItem("hungryhub-token") || "",
+  user: null,
+  authMode: "login"
 };
 
 const T = { "low-calorie": "Low calorie", "high-protein": "High protein" };
@@ -205,14 +202,107 @@ const W = {
   moderate: "Nice day: mix healthy + treat."
 };
 
+let FOODS = [...FALLBACK_FOODS];
 const tpl = $("foodCardTemplate").content.firstElementChild;
+
+function authHeaders() {
+  return S.token ? { Authorization: `Bearer ${S.token}` } : {};
+}
+
+async function api(path, options = {}) {
+  const res = await fetch(`${API}${path}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeaders(),
+      ...(options.headers || {})
+    },
+    ...options
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Request failed");
+  return data;
+}
+
+function setAuthMessage(text, isError = false) {
+  const msg = $("authMessage");
+  msg.textContent = text;
+  msg.style.color = isError ? "#dc2626" : "";
+}
+
+function openAuthModal() {
+  $("authOverlay").classList.add("visible");
+  $("authModal").classList.remove("auth-hidden");
+}
+
+function closeAuthModal() {
+  $("authOverlay").classList.remove("visible");
+  $("authModal").classList.add("auth-hidden");
+  setAuthMessage("");
+}
+
+function updateAuthButton() {
+  $("authBtn").textContent = S.user ? "Logout" : "Login";
+}
+
+function toggleAuthMode(mode) {
+  S.authMode = mode;
+  $("authTitle").textContent = mode === "login" ? "Login" : "Register";
+  $("loginTab").classList.toggle("active", mode === "login");
+  $("registerTab").classList.toggle("active", mode === "register");
+  $("authName").style.display = mode === "register" ? "" : "none";
+}
+
+async function initializeAuth() {
+  if (!S.token) {
+    openAuthModal();
+    updateAuthButton();
+    return false;
+  }
+  try {
+    const me = await api("/auth/me");
+    S.user = me.user;
+    closeAuthModal();
+    updateAuthButton();
+    return true;
+  } catch {
+    localStorage.removeItem("hungryhub-token");
+    S.token = "";
+    S.user = null;
+    openAuthModal();
+    updateAuthButton();
+    return false;
+  }
+}
+
+async function loadDataFromDb() {
+  try {
+    const [foodsRes, cartRes] = await Promise.all([api("/foods"), api("/cart")]);
+    FOODS = foodsRes.foods?.length ? foodsRes.foods : [...FALLBACK_FOODS];
+    S.cart = Array.isArray(cartRes.items) ? cartRes.items : [];
+  } catch {
+    FOODS = [...FALLBACK_FOODS];
+    S.cart = [];
+  }
+}
+
+async function saveCartToDb() {
+  if (!S.user) return;
+  try {
+    await api("/cart", {
+      method: "PUT",
+      body: JSON.stringify({ items: S.cart })
+    });
+  } catch {
+    // keep UI responsive even if db save fails
+  }
+}
 
 function totals() {
   let n = 0;
   let p = 0;
   let c = 0;
   S.cart.forEach((e) => {
-    const x = F.find((f) => f.id === e.id);
+    const x = FOODS.find((f) => f.id === e.id);
     if (x) {
       n += e.qty;
       p += x.price * e.qty;
@@ -230,7 +320,7 @@ function pickScore(x) {
 }
 
 function smartPicks(limit = 6) {
-  return [...F].sort((a, b) => pickScore(b) - pickScore(a)).slice(0, limit);
+  return [...FOODS].sort((a, b) => pickScore(b) - pickScore(a)).slice(0, limit);
 }
 
 function filterList(items) {
@@ -284,7 +374,7 @@ function card(item, el, options = {}) {
 
 function grid() {
   const g = $("foodGrid");
-  const list = filterList(F);
+  const list = filterList(FOODS);
   g.innerHTML = list.length ? "" : '<p class="empty-hint">No matches.</p>';
   list.forEach((x) => card(x, g, { anim: 0 }));
 }
@@ -296,7 +386,7 @@ function recs() {
 }
 
 function cats() {
-  const categories = ["All", ...new Set(F.map((x) => x.category))];
+  const categories = ["All", ...new Set(FOODS.map((x) => x.category))];
   const wrap = $("categoryList");
   wrap.innerHTML = "";
   categories.forEach((name) => {
@@ -315,11 +405,12 @@ function cats() {
 }
 
 function add(id) {
+  if (!S.user) return openAuthModal();
   const row = S.cart.find((x) => x.id === id);
   if (row) row.qty += 1;
   else S.cart.push({ id, qty: 1 });
-  localStorage.setItem("quickbite-cart", JSON.stringify(S.cart));
   paint();
+  saveCartToDb();
 }
 
 function sub(id) {
@@ -327,8 +418,8 @@ function sub(id) {
   if (i < 0) return;
   if (S.cart[i].qty > 1) S.cart[i].qty -= 1;
   else S.cart.splice(i, 1);
-  localStorage.setItem("quickbite-cart", JSON.stringify(S.cart));
   paint();
+  saveCartToDb();
 }
 
 function paint() {
@@ -336,7 +427,7 @@ function paint() {
   const ci = $("cartItems");
   ci.innerHTML = "";
   S.cart.forEach((e) => {
-    const x = F.find((f) => f.id === e.id);
+    const x = FOODS.find((f) => f.id === e.id);
     if (!x) return;
     const r = document.createElement("article");
     r.className = "cart-item";
@@ -428,12 +519,13 @@ async function wx() {
 }
 
 function theme() {
-  const dark = localStorage.getItem("quickbite-theme") === "dark";
+  const dark = localStorage.getItem("hungryhub-theme") === "dark";
   document.body.classList.toggle("dark", dark);
   $("darkModeToggle").textContent = dark ? "☀️" : "🌙";
 }
 
 function openCart() {
+  if (!S.user) return openAuthModal();
   $("cartPanel").classList.add("open");
   $("cartOverlay").classList.add("visible");
 }
@@ -475,12 +567,59 @@ $("cartOverlay").onclick = closeCart;
 $("darkModeToggle").onclick = () => {
   const dark = !document.body.classList.contains("dark");
   document.body.classList.toggle("dark", dark);
-  localStorage.setItem("quickbite-theme", dark ? "dark" : "light");
+  localStorage.setItem("hungryhub-theme", dark ? "dark" : "light");
   $("darkModeToggle").textContent = dark ? "☀️" : "🌙";
 };
 
 $("exploreBtn").onclick = () => {
   document.querySelector(".items-section").scrollIntoView({ behavior: "smooth" });
+};
+
+$("authBtn").onclick = async () => {
+  if (!S.user) return openAuthModal();
+  S.user = null;
+  S.token = "";
+  S.cart = [];
+  localStorage.removeItem("hungryhub-token");
+  updateAuthButton();
+  openAuthModal();
+  paint();
+};
+
+$("loginTab").onclick = () => toggleAuthMode("login");
+$("registerTab").onclick = () => toggleAuthMode("register");
+
+$("authForm").onsubmit = async (e) => {
+  e.preventDefault();
+  const name = $("authName").value.trim();
+  const email = $("authEmail").value.trim().toLowerCase();
+  const password = $("authPassword").value.trim();
+
+  if (!email || !password) return setAuthMessage("Email and password required.", true);
+  if (S.authMode === "register" && !name) return setAuthMessage("Name is required for register.", true);
+
+  try {
+    const endpoint = S.authMode === "login" ? "/auth/login" : "/auth/register";
+    const payload =
+      S.authMode === "login" ? { email, password } : { name, email, password };
+    const data = await api(endpoint, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+    S.token = data.token;
+    S.user = data.user;
+    localStorage.setItem("hungryhub-token", S.token);
+    setAuthMessage("Success! Loading your data...");
+    closeAuthModal();
+    updateAuthButton();
+    await loadDataFromDb();
+    cats();
+    grid();
+    recs();
+    paint();
+  } catch (err) {
+    setAuthMessage(err.message || "Login failed.", true);
+  }
 };
 
 const calorieFloat = $("calorieFloat");
@@ -492,12 +631,15 @@ calorieFloat.onkeydown = (e) => {
   }
 };
 
-
 theme();
 greet();
 head();
-cats();
-grid();
-recs();
-paint();
-wx();
+toggleAuthMode("login");
+initializeAuth().then(async (ok) => {
+  if (ok) await loadDataFromDb();
+  cats();
+  grid();
+  recs();
+  paint();
+  wx();
+});

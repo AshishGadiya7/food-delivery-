@@ -1,0 +1,17 @@
+{
+  "name": "hungryhub-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "HungryHub dashboard with login + sqlite backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7"
+  }
+}

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>QuickBite</title>
+  <title>HungryHub</title>
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap"
     rel="stylesheet"
@@ -16,7 +16,7 @@
       <div class="header-brand">
         <span class="logo-mark">QB</span>
         <div class="brand-text">
-          <span class="logo-title">QuickBite</span>
+          <span class="logo-title">HungryHub</span>
           <span class="logo-sub">Dashboard</span>
         </div>
       </div>
@@ -52,6 +52,7 @@
       </div>
 
       <div class="header-actions">
+        <button type="button" id="authBtn" class="icon-btn" aria-label="Login">Login</button>
         <button type="button" id="darkModeToggle" class="icon-btn" aria-label="Dark mode">🌙</button>
         <button type="button" id="cartToggle" class="cart-btn" aria-label="Open cart">
           <span class="cart-ico">🛒</span>
@@ -67,11 +68,7 @@
           <p>Weather picks, mood, live calories.</p>
           <button type="button" class="primary-btn" id="exploreBtn">Menu</button>
         </div>
-        <div class="hero-visual" aria-hidden="true">
-          <div class="float-emoji">🍜</div>
-          <div class="float-emoji delay">🥗</div>
-          <div class="float-emoji delay2">🧋</div>
-        </div>
+        <div class="hero-visual" aria-hidden="true"></div>
       </section>
 
       <section class="mood-section glass">
@@ -161,6 +158,23 @@
   </aside>
 
   <div id="cartOverlay" class="overlay"></div>
+
+  <div id="authOverlay" class="overlay visible"></div>
+  <section id="authModal" class="auth-modal glass" aria-live="polite">
+    <h2 id="authTitle">Login</h2>
+    <p class="section-sub">Use demo: <strong>demo@hungryhub.app</strong> / <strong>demo123</strong></p>
+    <div class="auth-tabs">
+      <button type="button" class="filter-btn active" id="loginTab">Login</button>
+      <button type="button" class="filter-btn" id="registerTab">Register</button>
+    </div>
+    <form id="authForm" class="auth-form">
+      <input id="authName" type="text" placeholder="Name (register only)" />
+      <input id="authEmail" type="email" placeholder="Email" required />
+      <input id="authPassword" type="password" placeholder="Password" required />
+      <button type="submit" class="primary-btn">Continue</button>
+      <p id="authMessage" class="auth-message"></p>
+    </form>
+  </section>
 
   <template id="foodCardTemplate">
     <article class="food-card">
